@@ -35,16 +35,21 @@ foo <- foreach(chromo = all_chromos) %dopar% {
   
   outBase <- gsub(".txt.gz", "_TopDom.txt", base_file)
   
-  # test_dt <- data.frame(binA = c(0, 40000, 120000),
-  #                       binB = c(0, 80000, 200000),
-  #                       count=c(55, 66, 77), stringsAsFactors = FALSE)
-  # test_dt$binA <- test_dt$binA/binSize
-  # test_dt$binB <- test_dt$binB/binSize
-  # stopifnot(test_dt$binA %%1  == 0)
-  # stopifnot(test_dt$binB %%1  == 0)
+  test_dt <- data.frame(binA = c(0, 40000, 120000),
+                        binB = c(0, 80000, 200000),
+                        count=c(55, 66, 77), stringsAsFactors = FALSE)
+  test_dt$binA <- test_dt$binA/binSize
+  test_dt$binB <- test_dt$binB/binSize
+  stopifnot(test_dt$binA %%1  == 0)
+  stopifnot(test_dt$binB %%1  == 0)
+  
+  # max_dim <- max(test_dt$binB+1)
+  # stopifnot(max_dim >= (test_dt$binA+1))
+  # 
   # in_mat <- sparseMatrix(i=test_dt$binA+1, j = test_dt$binB+1, x = test_dt$count)
   # in_mat
   # 4 x 6 sparse Matrix of class "dgCMatrix"
+  
   # 
   # [1,] 55 .  . . .  .
   # [2,]  . . 66 . .  .
@@ -65,6 +70,10 @@ foo <- foreach(chromo = all_chromos) %dopar% {
   # 5  0  0  0  0  0  0
   # 6  0  0  0 77  0  0
   
+  # in_mat <- sparseMatrix(i=test_dt$binA+1, j = test_dt$binB+1, x = test_dt$count, dims=c(max_dim, max_dim))
+  # in_mat
+  
+  
   in_dt <- read.table(inFile, col.names = c("binA", "binB", "count"), header=FALSE, stringsAsFactors = FALSE)
   stopifnot(in_dt$binB >= in_dt$binA)
   in_dt <- na.omit(in_dt)
@@ -73,7 +82,9 @@ foo <- foreach(chromo = all_chromos) %dopar% {
   in_dt$binB <- in_dt$binB/binSize
   stopifnot(in_dt$binA %%1  == 0)
   stopifnot(in_dt$binB %%1  == 0)
-  in_mat <- sparseMatrix(i=in_dt$binA+1, j = in_dt$binB+1, x = in_dt$count)
+  max_dim <- max(in_dt$binB+1)
+  stopifnot(max_dim >= (in_dt$binA+1))
+  in_mat <- sparseMatrix(i=in_dt$binA+1, j = in_dt$binB+1, x = in_dt$count, dims=c(max_dim, max_dim))
   in_dt <- as.data.frame(as.matrix(in_mat))
   stopifnot(dim(in_dt)[1] == dim(in_dt)[2]) 
   
