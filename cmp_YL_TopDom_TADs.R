@@ -1,6 +1,19 @@
 require(foreach)
 require(doMC)
 registerDoMC(4)
+require(ggpubr)
+require(ggplot2)
+require(ggsci)
+
+# Rscript cmp_YL_TopDom_TADs.R
+
+outFolder <- "CMP_YL_TOPDOM_TADS"
+dir.create(outFolder, recursive = TRUE)
+myHeight <- 5
+myWidth <- 8
+plotType <- "svg"
+
+
 chromo <- "chr1"
 
 all_chromos <- paste0("chr", c(1:22))
@@ -69,7 +82,7 @@ custom_p <- function(x) {
       plot.subtitle = element_text(hjust=0.5, size = 14, face="italic"),
       legend.title = element_text(face="bold")
     ) 
-  
+  return(x2)
 }
 
 pNbr <- ggdensity(all_aggByChr_dt,
@@ -90,7 +103,11 @@ pNbr <- ggdensity(all_aggByChr_dt,
   labs(color=paste0(legTitle),fill=paste0(legTitle), y="Density")  
 
 pNbr <- custom_p(pNbr)
-pNbr
+# pNbr
+outFile <- file.path(outFolder, paste0("signif_cmp_YL_TopDom_domainNbr_density.", plotType))
+ggsave(pNbr, file=outFile, height=myHeight, width=myWidth)
+cat(paste0("... written: ", outFile, "\n"))
+
   
 
 pSize <- ggdensity(all_dt,
@@ -111,13 +128,10 @@ pSize <- ggdensity(all_dt,
   labs(color=paste0(legTitle),fill=paste0(legTitle), y="Density")  
 
 pSize <- custom_p(pSize)
-pSize
+# pSize
 
 
-
-
-
-outFile <- file.path(outFolder, paste0("signif_all_meanCorr_dist_density.", plotType))
-ggsave(p2b, file=outFile, height=myHeight, width=myWidth)
+outFile <- file.path(outFolder, paste0("cmp_YL_TopDom_domainSize_density.", plotType))
+ggsave(pSize, file=outFile, height=myHeight, width=myWidth)
 cat(paste0("... written: ", outFile, "\n"))
 
