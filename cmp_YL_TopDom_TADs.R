@@ -10,7 +10,7 @@ require(ggsci)
 outFolder <- "CMP_YL_TOPDOM_TADS"
 dir.create(outFolder, recursive = TRUE)
 myHeight <- 5
-myWidth <- 8
+myWidth <- 7
 plotType <- "svg"
 
 

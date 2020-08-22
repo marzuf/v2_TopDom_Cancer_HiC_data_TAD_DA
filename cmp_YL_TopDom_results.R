@@ -4,10 +4,17 @@ require(ggsci)
 outFolder <- "CMP_YL_TOPDOM_RESULTS"
 dir.create(outFolder, recursive = TRUE)
 myHeight <- 5
-myWidth <- 8
+myWidth <- 7
 plotType <- "svg"
 
+plotTypeP <- "png"
+myHeightP <- myWidthP <- 400
+plotCex <- 1.2
+
+
 # Rscript cmp_YL_TopDom_results.R
+
+source("../Cancer_HiC_data_TAD_DA/utils_fct.R")
   
 
 td_folder <- "v2_TopDom_Cancer_HiC_data_TAD_DA"
@@ -84,4 +91,35 @@ stopifnot(sum(check_dt$adjPvalComb[check_dt$hicds == hicds & check_dt$exprds == 
 
 
 # GENE_RANK_TAD_RANK/all_gene_tad_signif_dt.Rdata
+
+gt_td_dt <- get(load(file.path("GENE_RANK_TAD_RANK/all_gene_tad_signif_dt.Rdata")))
+gt_yl_dt <- get(load(file.path("..", yl_folder, "GENE_RANK_TAD_RANK/all_gene_tad_signif_dt.Rdata")))
+
+gt_dt <- merge(gt_td_dt, gt_yl_dt, all.x=F, all.y=F,by=c("hicds", "exprds", "entrezID"), suffixes=c("_td", "_yl"))
+
+nDS <- length(unique(file.path(gt_dt$hicds, gt_dt$exprds)))
+
+all_plot_vars <- c("gene_rank", "tad_rank", "tad_adjCombPval", "adj.P.Val")
+
+for(plot_var in all_plot_vars) {
+  my_x <- gt_dt[,paste0(plot_var, "_yl")]
+  my_y <- gt_dt[,paste0(plot_var, "_td")]
+  
+  outFile <- file.path(outFolder, paste0(plot_var, "_TopDom_vs_YL_densplot.", plotTypeP)) 
+  do.call(plotTypeP, list(outFile, height=myHeightP, width=myWidthP))
+  densplot(x=my_x, y=my_y,
+           main=paste0(plot_var),
+           xlab=paste0("YL TADs"), ylab=paste0("TopDom TADs"),
+       cex.main=plotCex,cex.lab=plotCex,cex.axis=plotCex,
+       cex=0.7, pch=16)
+  mtext(side=3, text=paste0("# DS = ", nDS))
+  addCorr(x=my_x,y=my_y,bty="n")
+  
+  foo <- dev.off()
+  cat(paste0("...written:", outFile,"\n"))
+    
+}
+
+
+
 
