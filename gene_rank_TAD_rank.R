@@ -110,7 +110,17 @@ if(buildTable) {
     exprds_dt <- foreach(exprds = all_exprds[[paste0(hicds)]], .combine='rbind') %do% {
       
       
+      
+      comb_empPval_file <- file.path(pipFolder, hicds, exprds, script11same_name, "emp_pval_combined.Rdata" )
+      
+      
+      if(!file.exists(comb_empPval_file)) return(NULL)
+      
+      
       regionList_file <- file.path(pipFolder, hicds, exprds, script0_name, "pipeline_regionList.Rdata")
+      
+      if(!file.exists(regionList_file)) cat(paste0(regionList_file, "\n"))
+      
       stopifnot(file.exists(regionList_file))
       all_regs <- get(load(regionList_file))
       
@@ -123,11 +133,6 @@ if(buildTable) {
       
       exprds_g2t_dt <- g2t_dt[g2t_dt$entrezID %in% pipeline_geneList,]
       
-      
-      comb_empPval_file <- file.path(pipFolder, hicds, exprds, script11same_name, "emp_pval_combined.Rdata" )
-      
-      
-      if(!file.exists(comb_empPval_file)) return(NULL)
       
       
       stopifnot(file.exists(comb_empPval_file))
